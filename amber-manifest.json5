@@ -1,0 +1,33 @@
+{
+  manifest_version: "0.1.0",
+
+  // NOTE:
+  // This manifest is provided so the URL is resolvable for registration.
+  // The current image entrypoint is a CLI process, not a full A2A server.
+  // You should replace entrypoint/image with an A2A-compatible server implementation.
+  config_schema: {
+    type: "object",
+    properties: {},
+    required: [],
+    additionalProperties: true,
+  },
+
+  slots: {
+    proxy: { kind: "a2a", optional: true },
+  },
+
+  program: {
+    image: "ghcr.io/tensor2023/agentx-spring0123:latest",
+    entrypoint: "node dist/cli.js",
+    env: {},
+    network: {
+      endpoints: [{ name: "a2a_endpoint", port: 9010 }],
+    },
+  },
+
+  provides: {
+    a2a: { kind: "a2a", endpoint: "a2a_endpoint" },
+  },
+
+  exports: { a2a: "a2a" },
+}
