@@ -125,3 +125,8 @@ benchmarks/report.json
 benchmarks/explain.json
 benchmarks/.module-*
 .github/issues/docs
+
+# Python (A2A server)
+__pycache__/
+*.py[cod]
+.venv/
