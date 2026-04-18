@@ -1,18 +1,18 @@
-FROM node:20-bookworm-slim
+# Official A2A agent pattern (AgentBeats expects HTTP server with --host/--port/--card-url).
+# Build for linux/amd64 when publishing from CI.
+FROM ghcr.io/astral-sh/uv:python3.13-bookworm
 
-WORKDIR /app
+RUN adduser agent
+USER agent
+WORKDIR /home/agent
 
-# Enable pnpm via Corepack and install dependencies first for better layer cache.
-RUN corepack enable
+COPY pyproject.toml uv.lock README.md ./
+COPY src src
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY plugins/vscode/package.json ./plugins/vscode/package.json
-COPY patches ./patches
+RUN \
+    --mount=type=cache,target=/home/agent/.cache/uv,uid=1000 \
+    uv sync --locked
 
-RUN pnpm install --frozen-lockfile
-
-COPY . .
-
-RUN pnpm run build
-
-ENTRYPOINT ["node", "dist/cli.js"]
+ENTRYPOINT ["uv", "run", "src/server.py"]
+CMD ["--host", "0.0.0.0", "--port", "9009"]
+EXPOSE 9009
